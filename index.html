@@ -14,8 +14,9 @@
             <p id="barChartTitle">Royall Partnerships by Origination Year</p>
         </div>
         <div id="barChart"></div>
+        <div class="pagebreak"></div>
         <div id="pieChart"></div>     
-        <div id="pieChartCaption"></div>
+        <div id="pieChartCaption"><em id="rrt"></em> All-Time Retention Rate</div>
         
         
         
@@ -230,9 +231,13 @@ console.log(retention);
             .attr("d",arc);
 		
 		
+		function pct(a,b){
+				return a/(a+b)*100;
+		}
+
+		var retentionRate = pct(retention.retained,retention.lost);
 		
-		
-		
+		d3.select("#rrt").html(Math.round(retentionRate*100)/100+"% <br/>");
 		
 		
 		};
