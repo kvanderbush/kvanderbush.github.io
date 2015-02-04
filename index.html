@@ -6,43 +6,58 @@
         <script type="text/javascript" src="d3.v3.js"></script>
 		<link rel="stylesheet" type="text/css" href="stylesheet.css">
     </head>
-    <body bgcolor="black">
+    <body>
         <div>
             <p id="title">royall<em>&</em>company</p>
         </div>
         <div>
             <p id="barChartTitle">Royall Partnerships by Origination Year</p>
         </div>
+        <div id="barChart"></div>
+        <div id="pieChart"></div>     
+        <div id="pieChartCaption"></div>
         
-                
+        
+        
+        
+        
         <script type="text/javascript">
 		var dataset;
 		var w = 100;
 		var h = 200;
 		var barBuffer = 2;
+//Create Schools dataset
 		d3.csv("schools.csv", function(d){
 			dataset = d;
 			//alert("Data Has Been Loaded!");
 			load();
 			});
 		function load(){
-		
+//All d3.js actions happen below within load() *after csv import*
+
+//Nest to transform dataset object
 		var years=d3.nest()
 			.key(function(d){ return d.year;})
 			.sortKeys(d3.ascending)
 			.entries(dataset);
 
-		svg = d3.select("body").append("svg")
-            .attr("id","barChart")
-			.attr("height",h)
-			.attr("width",w + "%")
-			.attr("background-color","black");
+            
+
+
+//define the ToolTips
 		var bdiv = d3.select("body").append("div")
 			.attr("class","barTip")
 			.style("opacity",0);
         var cdiv = d3.select("body").append("div")
 			.attr("class","cirTip")
 			.style("opacity",0);
+            
+        
+//build barChart
+		svg = d3.select("#barChart").append("svg")
+			.attr("height",h)
+			.attr("width",w + "%");            
+
 		var barchart = svg.selectAll("rect")
 			.data(years)
 			.enter()
@@ -71,7 +86,7 @@
 				})
 			.on("mouseout",function(d){
 				bdiv.transition()
-					.duration(1000)
+					.duration(500)
 					.style("opacity",0);
 			})
 			.transition()
@@ -83,7 +98,7 @@
 			.attr("fill",d3.rgb(42,110,187))
 			.attr("y",function(d){
 				return (h-d.values.length*4)-10;
-					})
+					});
 
 		svg.selectAll("text")
 			.data(years)
@@ -127,7 +142,9 @@
 				return d.running_sum;
 				})])
 			.range([h-h/3,h/3]);
-		svg.selectAll("circle")
+		
+//add circles to barChart
+        svg.selectAll("circle")
 			.data(years_running_total)
 			.enter()
 			.append("circle")
@@ -143,7 +160,7 @@
 				})
 			.on("mouseout",function(d){
 				cdiv.transition()
-					.duration(1000)
+					.duration(500)
 					.style("opacity",0);
 			})
 			.transition()
@@ -160,9 +177,57 @@
 			.attr("fill",d3.rgb(187,19,62))
 			.attr("opacity",0.5);
 			
-				
-			
 		
+
+        
+
+            
+
+//Create Donut using Pie layout            
+        var pie = d3.layout.pie();
+        var colors = ["rgb(187,19,62)","rgba(0,0,0,0)"];
+        var retention = ({
+            "retained": 0,
+            "lost": 0
+        });
+ 
+       for (var i=0;i<dataset.length;i++){
+        if(dataset[i].subtype == "Existing Client"){
+            retention.retained++;
+        }else{
+            retention.lost++;
+        }
+       }
+
+        var rt = [retention.retained,retention.lost];
+                         
+console.log(retention);
+
+       var svgpie = d3.select("#pieChart").append("svg")
+            .attr("width",w+"%")
+            .attr("height",h)
+            .attr("id","svgPie")
+            .append("g")
+            .attr("transform","translate("+w+","+h/2+")");
+        var donut = d3.layout.pie()
+            .sort(null);
+        var arc = d3.svg.arc()
+            .innerRadius(50)
+            .outerRadius(100);
+        var colors = ["rgba(187,19,62,1)","rgba(0,0,0,0)"] ;   
+       svgpie.selectAll("path")
+            .data(donut(rt))
+            .enter()
+            .append("path")
+            .attr("cx",0)
+            .attr("cy",0)
+            .attr("r",function(d){
+                return d;
+                })
+            .attr("fill",function(d,i){
+                return colors[i];
+           })
+            .attr("d",arc);
 		
 		
 		

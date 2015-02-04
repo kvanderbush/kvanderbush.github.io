@@ -1,3 +1,8 @@
+html{
+ background:  -webkit-linear-gradient(rgba(0,0,0,1),rgba(0,0,0,0.98)) no-repeat center center fixed;
+    -webkit-background-size: cover;
+}
+
 body{
 color: white;
 text-emphasis-color: inherit;
@@ -104,4 +109,11 @@ div.cirTip{
 }
     
 
-
+#pieChart{
+    width: 33%;
+    float: left;
+}
+#pieChartCaption{
+    width: 66%;
+    float: right
+}
