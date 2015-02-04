@@ -211,7 +211,8 @@ console.log(retention);
             .append("g")
             .attr("transform","translate("+w+","+h/2+")");
         var donut = d3.layout.pie()
-            .sort(null);
+            .sort(null)
+            .value(function(d){ return d;});
         var arc = d3.svg.arc()
             .innerRadius(50)
             .outerRadius(100);
@@ -222,13 +223,24 @@ console.log(retention);
             .append("path")
             .attr("cx",0)
             .attr("cy",0)
+
             .attr("r",function(d){
                 return d;
                 })
+
             .attr("fill",function(d,i){
                 return colors[i];
            })
-            .attr("d",arc);
+            .transition()
+            .delay(2000)
+            .duration(750)
+            .attrTween("d",function(d){
+            	var i = d3.interpolate(d.startAngle+0.1,d.endAngle);
+            	return function(t){
+            			d.endAngle = i(t);
+            			return arc(d);
+            		}
+            	});
 		
 		
 		function pct(a,b){
@@ -237,7 +249,14 @@ console.log(retention);
 
 		var retentionRate = pct(retention.retained,retention.lost);
 		
-		d3.select("#rrt").html(Math.round(retentionRate*100)/100+"% <br/>");
+		d3.select("#rrt")
+			.html(Math.round(retentionRate*100)/100+"% <br/>");
+
+		d3.select("#pieChartCaption")
+			.transition()
+			.delay(2000)
+			.duration(500)
+			.style("opacity",1);		
 		
 		
 		};
